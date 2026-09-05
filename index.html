@@ -151,7 +151,6 @@
                 >
 
 
-                <!-- PRIORITY -->
                 <select id="priorityInput">
 
                     <option value="low">
@@ -169,55 +168,6 @@
                 </select>
 
 
-                <!-- STATUS -->
-                <select id="statusInput">
-
-                    <option value="pending">
-                        ⚪ Pending
-                    </option>
-
-                    <option value="in-progress">
-                        🟡 In Progress
-                    </option>
-
-                    <option value="completed">
-                        🟢 Completed
-                    </option>
-
-                </select>
-
-
-                <!-- PROGRESS -->
-                <select id="progressInput">
-
-                    <option value="0">
-                        0%
-                    </option>
-
-                    <option value="10">
-                        10%
-                    </option>
-
-                    <option value="25">
-                        25%
-                    </option>
-
-                    <option value="50">
-                        50%
-                    </option>
-
-                    <option value="75">
-                        75%
-                    </option>
-
-                    <option value="100">
-                        100%
-                    </option>
-
-                </select>
-
-
-                <!-- DUE DATE -->
                 <input
                     type="date"
                     id="dueDateInput"
@@ -231,12 +181,12 @@
             </div>
 
 
-            <!-- SEARCH + FILTERS -->
+            <!-- SEARCH -->
             <div class="task-tools">
 
                 <div class="search-box">
 
-                    🔎
+                    <span>🔎</span>
 
                     <input
                         type="text"
@@ -278,29 +228,12 @@
             <!-- TASK LIST -->
             <ul id="taskList"></ul>
 
-
-            <!-- EMPTY MESSAGE -->
-            <div
-                id="emptyMessage"
-                class="empty-message"
-            >
-                <span>🌿</span>
-
-                <h3>No tasks yet</h3>
-
-                <p>
-                    Add your first task and start getting things done.
-                </p>
-
-            </div>
-
         </section>
 
     </main>
 
 
     <!-- EDIT TASK MODAL -->
-
     <div class="modal" id="editModal">
 
         <div class="modal-content">
@@ -321,7 +254,6 @@
             </div>
 
 
-            <!-- TASK -->
             <label for="editTaskInput">
                 Task
             </label>
@@ -333,7 +265,6 @@
             >
 
 
-            <!-- PRIORITY -->
             <label for="editPriorityInput">
                 Priority
             </label>
@@ -355,63 +286,6 @@
             </select>
 
 
-            <!-- STATUS -->
-            <label for="editStatusInput">
-                Status
-            </label>
-
-            <select id="editStatusInput">
-
-                <option value="pending">
-                    ⚪ Pending
-                </option>
-
-                <option value="in-progress">
-                    🟡 In Progress
-                </option>
-
-                <option value="completed">
-                    🟢 Completed
-                </option>
-
-            </select>
-
-
-            <!-- PROGRESS -->
-            <label for="editProgressInput">
-                Progress
-            </label>
-
-            <select id="editProgressInput">
-
-                <option value="0">
-                    0%
-                </option>
-
-                <option value="10">
-                    10%
-                </option>
-
-                <option value="25">
-                    25%
-                </option>
-
-                <option value="50">
-                    50%
-                </option>
-
-                <option value="75">
-                    75%
-                </option>
-
-                <option value="100">
-                    100%
-                </option>
-
-            </select>
-
-
-            <!-- DUE DATE -->
             <label for="editDueDateInput">
                 Due Date
             </label>
@@ -422,7 +296,33 @@
             >
 
 
-            <!-- BUTTONS -->
+            <!-- EDIT PROGRESS -->
+            <div class="edit-progress">
+
+                <div class="edit-progress-header">
+
+                    <label for="editProgressInput">
+                        Progress
+                    </label>
+
+                    <span id="editProgressValue">
+                        0%
+                    </span>
+
+                </div>
+
+
+                <input
+                    type="range"
+                    id="editProgressInput"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+
+            </div>
+
+
             <div class="modal-buttons">
 
                 <button
@@ -437,7 +337,7 @@
                     class="save-btn"
                 >
                     Save Changes
-                </button>s
+                </button>
 
             </div>
 

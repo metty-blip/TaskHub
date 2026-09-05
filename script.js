@@ -1,37 +1,54 @@
-// =========================================
-// TASKHUB - TASK MANAGER
-// STATUS + INDIVIDUAL PROGRESS
-// =========================================
+// =========================================================
+// TASKHUB
+// INDIVIDUAL TASK STATUS + DRAGGABLE PROGRESS
+// =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // =========================================
+    // =====================================================
     // ELEMENTS
-    // =========================================
+    // =====================================================
 
-    const fieldButtons = document.querySelectorAll(".field");
+    const fieldButtons =
+        document.querySelectorAll(".field");
 
-    const taskArea = document.getElementById("taskArea");
+    const taskArea =
+        document.getElementById("taskArea");
 
-    const fieldTitle = document.getElementById("fieldTitle");
-    const taskSubtitle = document.getElementById("taskSubtitle");
+    const fieldTitle =
+        document.getElementById("fieldTitle");
 
-    const taskInput = document.getElementById("taskInput");
-    const priorityInput = document.getElementById("priorityInput");
-    const statusInput = document.getElementById("statusInput");
-    const progressInput = document.getElementById("progressInput");
-    const dueDateInput = document.getElementById("dueDateInput");
+    const taskSubtitle =
+        document.getElementById("taskSubtitle");
 
-    const addTaskButton = document.getElementById("addTask");
+    const taskInput =
+        document.getElementById("taskInput");
 
-    const taskList = document.getElementById("taskList");
+    const priorityInput =
+        document.getElementById("priorityInput");
 
-    const searchInput = document.getElementById("searchInput");
+    const dueDateInput =
+        document.getElementById("dueDateInput");
 
-    const filterButtons = document.querySelectorAll(".filter");
+    const addTaskButton =
+        document.getElementById("addTask");
+
+    const taskList =
+        document.getElementById("taskList");
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const filterButtons =
+        document.querySelectorAll(".filter");
 
     const clearCompletedButton =
         document.getElementById("clearCompleted");
+
+
+    // =====================================================
+    // STATISTICS
+    // =====================================================
 
     const totalTasks =
         document.getElementById("totalTasks");
@@ -46,9 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("progressPercent");
 
 
-    // =========================================
-    // EDIT MODAL ELEMENTS
-    // =========================================
+    // =====================================================
+    // EDIT MODAL
+    // =====================================================
 
     const editModal =
         document.getElementById("editModal");
@@ -59,14 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const editPriorityInput =
         document.getElementById("editPriorityInput");
 
-    const editStatusInput =
-        document.getElementById("editStatusInput");
+    const editDueDateInput =
+        document.getElementById("editDueDateInput");
 
     const editProgressInput =
         document.getElementById("editProgressInput");
 
-    const editDueDateInput =
-        document.getElementById("editDueDateInput");
+    const editProgressValue =
+        document.getElementById("editProgressValue");
 
     const saveEditButton =
         document.getElementById("saveEdit");
@@ -78,9 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("closeModal");
 
 
-    // =========================================
-    // APP STATE
-    // =========================================
+    // =====================================================
+    // STATE
+    // =====================================================
 
     let currentField = "";
 
@@ -91,127 +108,149 @@ document.addEventListener("DOMContentLoaded", () => {
     let taskBeingEdited = null;
 
 
-    // =========================================
+    // =====================================================
     // LOAD TASKS
-    // =========================================
+    // =====================================================
 
     let tasks = {};
 
     try {
+
         tasks =
             JSON.parse(
-                localStorage.getItem("taskhubTasks")
+                localStorage.getItem(
+                    "taskhubTasks"
+                )
             ) || {};
+
     } catch (error) {
+
+        console.error(
+            "Could not load tasks.",
+            error
+        );
+
         tasks = {};
     }
 
 
-    // =========================================
-    // HIDE TASK AREA UNTIL CATEGORY IS SELECTED
-    // =========================================
+    // =====================================================
+    // HIDE TASK AREA INITIALLY
+    // =====================================================
 
     taskArea.style.display = "none";
 
 
-    // =========================================
-    // CATEGORY SELECTION
-    // =========================================
+    // =====================================================
+    // CATEGORY BUTTONS
+    // =====================================================
 
     fieldButtons.forEach(button => {
 
-        button.addEventListener("click", () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-            currentField =
-                button.dataset.field;
-
-
-            // Remove active state
-            fieldButtons.forEach(btn => {
-                btn.classList.remove("active");
-            });
+                currentField =
+                    button.dataset.field;
 
 
-            // Add active state
-            button.classList.add("active");
+                // Active category
+                fieldButtons.forEach(btn => {
+
+                    btn.classList.remove(
+                        "active"
+                    );
+
+                });
 
 
-            // Create category if necessary
-            if (!tasks[currentField]) {
-                tasks[currentField] = [];
-            }
-
-
-            // Show task area
-            taskArea.style.display = "block";
-
-
-            // Update title
-            fieldTitle.textContent =
-                `${currentField} Tasks`;
-
-
-            // Remove emoji from subtitle
-            const cleanField =
-                currentField.replace(
-                    /^.+?\s/,
-                    ""
+                button.classList.add(
+                    "active"
                 );
 
 
-            taskSubtitle.textContent =
-                `Manage your ${cleanField.toLowerCase()} tasks below.`;
+                // Create category
+                if (!tasks[currentField]) {
+
+                    tasks[currentField] = [];
+
+                }
 
 
-            // Reset search
-            searchInput.value = "";
-            searchTerm = "";
+                // Show task area
+                taskArea.style.display =
+                    "block";
 
 
-            // Reset filter
-            currentFilter = "all";
+                // Title
+                fieldTitle.textContent =
+                    `${currentField} Tasks`;
 
 
-            filterButtons.forEach(btn => {
-                btn.classList.remove("active");
-            });
+                // Subtitle
+                const cleanField =
+                    currentField.replace(
+                        /^.+?\s/,
+                        ""
+                    );
 
 
-            const allButton =
-                document.querySelector(
-                    '[data-filter="all"]'
-                );
+                taskSubtitle.textContent =
+                    `Manage your ${cleanField.toLowerCase()} tasks below.`;
 
-            if (allButton) {
-                allButton.classList.add("active");
+
+                // Reset filters
+                currentFilter = "all";
+
+                searchTerm = "";
+
+                searchInput.value = "";
+
+
+                filterButtons.forEach(btn => {
+
+                    btn.classList.remove(
+                        "active"
+                    );
+
+                });
+
+
+                const allButton =
+                    document.querySelector(
+                        '[data-filter="all"]'
+                    );
+
+
+                if (allButton) {
+
+                    allButton.classList.add(
+                        "active"
+                    );
+
+                }
+
+
+                displayTasks();
+
+                updateStats();
+
+
+                taskArea.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
             }
-
-
-            displayTasks();
-
-            updateStats();
-
-
-            // Scroll to task area
-            taskArea.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-
-            // Focus task input
-            setTimeout(() => {
-                taskInput.focus();
-            }, 400);
-
-        });
+        );
 
     });
 
 
-    // =========================================
+    // =====================================================
     // ADD TASK
-    // =========================================
+    // =====================================================
 
     addTaskButton.addEventListener(
         "click",
@@ -224,7 +263,9 @@ document.addEventListener("DOMContentLoaded", () => {
         event => {
 
             if (event.key === "Enter") {
+
                 addTask();
+
             }
 
         }
@@ -233,12 +274,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function addTask() {
 
-        const text =
-            taskInput.value.trim();
-
-
-        // Category check
-        if (currentField === "") {
+        // Category
+        if (!currentField) {
 
             alert(
                 "Please choose a category first."
@@ -248,8 +285,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        // Empty task check
-        if (text === "") {
+        // Task text
+        const text =
+            taskInput.value.trim();
+
+
+        if (!text) {
 
             alert(
                 "Please enter a task."
@@ -261,48 +302,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        // Get progress
-        let progress =
-            Number(progressInput.value);
-
-
-        // Get status
-        let status =
-            statusInput.value;
-
-
-        // Make sure progress/status agree
-        if (progress >= 100) {
-
-            progress = 100;
-            status = "completed";
-
-        } else if (progress > 0 && status === "pending") {
-
-            status = "in-progress";
-
-        }
-
-
         // Create task
         const newTask = {
 
-            id: Date.now(),
+            id:
+                Date.now(),
 
-            text: text,
+            text:
+                text,
 
             priority:
                 priorityInput.value,
 
-            status: status,
-
-            progress: progress,
-
             dueDate:
                 dueDateInput.value,
 
+            progress:
+                0,
+
+            status:
+                "pending",
+
             completed:
-                status === "completed",
+                false,
 
             createdAt:
                 new Date().toISOString()
@@ -310,13 +332,15 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
 
-        // Create category if needed
+        // Create category if necessary
         if (!tasks[currentField]) {
+
             tasks[currentField] = [];
+
         }
 
 
-        // Add task
+        // Add
         tasks[currentField].push(
             newTask
         );
@@ -326,14 +350,11 @@ document.addEventListener("DOMContentLoaded", () => {
         saveTasks();
 
 
-        // Reset inputs
+        // Reset
         taskInput.value = "";
 
-        priorityInput.value = "medium";
-
-        statusInput.value = "pending";
-
-        progressInput.value = "0";
+        priorityInput.value =
+            "medium";
 
         dueDateInput.value = "";
 
@@ -343,15 +364,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateStats();
 
-
         taskInput.focus();
 
     }
 
 
-    // =========================================
+    // =====================================================
     // DISPLAY TASKS
-    // =========================================
+    // =====================================================
 
     function displayTasks() {
 
@@ -362,113 +382,108 @@ document.addEventListener("DOMContentLoaded", () => {
             tasks[currentField] || [];
 
 
-        // =====================================
+        // -------------------------------------------------
         // SEARCH
-        // =====================================
+        // -------------------------------------------------
 
-        if (searchTerm !== "") {
+        if (searchTerm) {
 
             currentTasks =
-                currentTasks.filter(task =>
-                    task.text
-                        .toLowerCase()
-                        .includes(
-                            searchTerm.toLowerCase()
-                        )
+                currentTasks.filter(
+                    task =>
+                        task.text
+                            .toLowerCase()
+                            .includes(
+                                searchTerm.toLowerCase()
+                            )
                 );
 
         }
 
 
-        // =====================================
+        // -------------------------------------------------
         // FILTER
-        // =====================================
+        // -------------------------------------------------
 
-        if (currentFilter === "pending") {
+        if (
+            currentFilter ===
+            "pending"
+        ) {
 
             currentTasks =
-                currentTasks.filter(task =>
-                    task.status !== "completed"
+                currentTasks.filter(
+                    task =>
+                        task.status !==
+                        "completed"
                 );
 
         }
 
 
-        if (currentFilter === "completed") {
+        if (
+            currentFilter ===
+            "completed"
+        ) {
 
             currentTasks =
-                currentTasks.filter(task =>
-                    task.status === "completed"
+                currentTasks.filter(
+                    task =>
+                        task.status ===
+                        "completed"
                 );
 
         }
 
 
-        // =====================================
-        // EMPTY STATE
-        // =====================================
+        // -------------------------------------------------
+        // EMPTY
+        // -------------------------------------------------
 
-        if (currentTasks.length === 0) {
+        if (
+            currentTasks.length === 0
+        ) {
 
             const empty =
                 document.createElement("li");
+
 
             empty.className =
                 "empty-message";
 
 
-            if (searchTerm !== "") {
+            empty.innerHTML = `
+                <span>🌿</span>
 
-                empty.innerHTML = `
-                    <span>🔎</span>
-                    <h3>No tasks found</h3>
-                    <p>No tasks match your search.</p>
-                `;
+                <h3>No tasks here</h3>
 
-            } else if (currentFilter === "completed") {
-
-                empty.innerHTML = `
-                    <span>🎉</span>
-                    <h3>No completed tasks</h3>
-                    <p>Complete a task and it will appear here.</p>
-                `;
-
-            } else if (currentFilter === "pending") {
-
-                empty.innerHTML = `
-                    <span>✨</span>
-                    <h3>No pending tasks</h3>
-                    <p>You're all caught up!</p>
-                `;
-
-            } else {
-
-                empty.innerHTML = `
-                    <span>🌿</span>
-                    <h3>No tasks yet</h3>
-                    <p>Add your first task and start getting things done.</p>
-                `;
-
-            }
+                <p>
+                    Add a task to get started.
+                </p>
+            `;
 
 
-            taskList.appendChild(empty);
+            taskList.appendChild(
+                empty
+            );
 
             return;
         }
 
 
-        // =====================================
-        // CREATE TASK CARDS
-        // =====================================
+        // -------------------------------------------------
+        // CREATE TASKS
+        // -------------------------------------------------
 
         currentTasks.forEach(task => {
 
-            // ---------------------------------
-            // Make old tasks compatible
-            // ---------------------------------
+            // ---------------------------------------------
+            // Compatibility with older tasks
+            // ---------------------------------------------
 
-            if (typeof task.progress !== "number") {
+            if (
+                typeof task.progress !==
+                "number"
+            ) {
 
                 task.progress =
                     task.completed
@@ -483,82 +498,111 @@ document.addEventListener("DOMContentLoaded", () => {
                 task.status =
                     task.completed
                         ? "completed"
-                        : "pending";
+                        : task.progress > 0
+                            ? "in-progress"
+                            : "pending";
 
             }
 
 
-            // ---------------------------------
-            // Main LI
-            // ---------------------------------
+            // ---------------------------------------------
+            // TASK CARD
+            // ---------------------------------------------
 
             const li =
                 document.createElement("li");
+
 
             li.className =
                 "task-item";
 
 
             if (
-                task.completed ||
-                task.status === "completed"
+                task.status ===
+                "completed"
             ) {
-                li.classList.add("completed");
+
+                li.classList.add(
+                    "completed"
+                );
+
             }
 
 
-            // ---------------------------------
-            // MAIN WRAPPER
-            // ---------------------------------
+            // ---------------------------------------------
+            // MAIN
+            // ---------------------------------------------
 
             const main =
                 document.createElement("div");
+
 
             main.className =
                 "task-main";
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // CHECKBOX
-            // ---------------------------------
+            // ---------------------------------------------
 
             const checkbox =
-                document.createElement("input");
+                document.createElement(
+                    "input"
+                );
+
 
             checkbox.type =
                 "checkbox";
 
+
             checkbox.className =
                 "task-checkbox";
 
+
             checkbox.checked =
-                task.status === "completed";
+                task.status ===
+                "completed";
 
 
             checkbox.addEventListener(
                 "change",
                 () => {
 
-                    if (checkbox.checked) {
-
-                        task.status =
-                            "completed";
+                    if (
+                        checkbox.checked
+                    ) {
 
                         task.progress =
                             100;
+
+                        task.status =
+                            "completed";
 
                         task.completed =
                             true;
 
                     } else {
 
-                        task.status =
-                            "in-progress";
+                        // Don't jump to 50%.
+                        // Keep the user's previous
+                        // percentage.
 
-                        task.progress =
-                            task.progress >= 100
-                                ? 50
-                                : task.progress;
+                        if (
+                            task.progress >=
+                            100
+                        ) {
+
+                            task.progress =
+                                99;
+
+                        }
+
+
+                        task.status =
+                            task.progress > 0
+                                ? "in-progress"
+                                : "pending";
+
 
                         task.completed =
                             false;
@@ -576,60 +620,77 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // CONTENT
-            // ---------------------------------
+            // ---------------------------------------------
 
             const content =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             content.className =
                 "task-content";
 
 
-            // ---------------------------------
-            // TASK TITLE
-            // ---------------------------------
+            // ---------------------------------------------
+            // TITLE
+            // ---------------------------------------------
 
             const title =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             title.className =
                 "task-title";
+
 
             title.textContent =
                 task.text;
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // META
-            // ---------------------------------
+            // ---------------------------------------------
 
             const meta =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             meta.className =
                 "task-meta";
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // STATUS
-            // ---------------------------------
+            // ---------------------------------------------
 
             const status =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
+
 
             status.className =
                 `status-badge status-${task.status}`;
 
 
-            if (task.status === "completed") {
+            if (
+                task.status ===
+                "completed"
+            ) {
 
                 status.textContent =
                     "🟢 Completed";
 
             } else if (
-                task.status === "in-progress"
+                task.status ===
+                "in-progress"
             ) {
 
                 status.textContent =
@@ -643,27 +704,36 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            meta.appendChild(status);
+            meta.appendChild(
+                status
+            );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // PRIORITY
-            // ---------------------------------
+            // ---------------------------------------------
 
             const priority =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
+
 
             priority.className =
                 `priority-badge priority-${task.priority}`;
 
 
-            if (task.priority === "high") {
+            if (
+                task.priority ===
+                "high"
+            ) {
 
                 priority.textContent =
                     "🔴 High";
 
             } else if (
-                task.priority === "medium"
+                task.priority ===
+                "medium"
             ) {
 
                 priority.textContent =
@@ -677,89 +747,127 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            meta.appendChild(priority);
+            meta.appendChild(
+                priority
+            );
 
 
-            // ---------------------------------
-            // CREATED DATE
-            // ---------------------------------
+            // ---------------------------------------------
+            // CREATED
+            // ---------------------------------------------
 
             const created =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
+
 
             created.className =
                 "task-date";
 
+
             created.textContent =
-                `Added ${formatDate(task.createdAt)}`;
+                `Added ${formatDate(
+                    task.createdAt
+                )}`;
 
 
-            meta.appendChild(created);
+            meta.appendChild(
+                created
+            );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // DUE DATE
-            // ---------------------------------
+            // ---------------------------------------------
 
             if (task.dueDate) {
 
                 const due =
-                    document.createElement("span");
+                    document.createElement(
+                        "span"
+                    );
+
 
                 due.className =
                     "due-date";
 
 
                 if (
-                    task.status !== "completed" &&
-                    isOverdue(task.dueDate)
+                    task.status !==
+                    "completed" &&
+                    isOverdue(
+                        task.dueDate
+                    )
                 ) {
 
-                    due.classList.add("overdue");
+                    due.classList.add(
+                        "overdue"
+                    );
+
 
                     due.textContent =
-                        `⚠️ Overdue ${formatDueDate(task.dueDate)}`;
+                        `⚠️ Overdue ${formatDueDate(
+                            task.dueDate
+                        )}`;
 
                 } else {
 
                     due.textContent =
-                        `📅 Due ${formatDueDate(task.dueDate)}`;
+                        `📅 Due ${formatDueDate(
+                            task.dueDate
+                        )}`;
 
                 }
 
 
-                meta.appendChild(due);
+                meta.appendChild(
+                    due
+                );
 
             }
 
 
-            // ---------------------------------
-            // PROGRESS
-            // ---------------------------------
+            // ---------------------------------------------
+            // INDIVIDUAL PROGRESS
+            // ---------------------------------------------
 
             const progressContainer =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             progressContainer.className =
                 "task-progress";
 
 
+            // Progress info
             const progressInfo =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             progressInfo.className =
                 "progress-info";
 
 
             const progressLabel =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
+
 
             progressLabel.textContent =
-                "Progress";
+                "Task Progress";
 
 
             const progressValue =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
+
 
             progressValue.textContent =
                 `${task.progress}%`;
@@ -769,77 +877,221 @@ document.addEventListener("DOMContentLoaded", () => {
                 progressLabel
             );
 
+
             progressInfo.appendChild(
                 progressValue
             );
 
 
-            // Progress bar
-            const progressBar =
-                document.createElement("div");
+            // ---------------------------------------------
+            // RANGE SLIDER
+            // ---------------------------------------------
 
-            progressBar.className =
-                "task-progress-bar";
-
-
-            const progressFill =
-                document.createElement("div");
-
-            progressFill.className =
-                "task-progress-fill";
+            const slider =
+                document.createElement(
+                    "input"
+                );
 
 
-            progressFill.style.width =
-                `${task.progress}%`;
+            slider.type =
+                "range";
 
 
-            progressBar.appendChild(
-                progressFill
+            slider.className =
+                "task-slider";
+
+
+            slider.min =
+                "0";
+
+
+            slider.max =
+                "100";
+
+
+            slider.step =
+                "1";
+
+
+            slider.value =
+                task.progress;
+
+
+            slider.style.setProperty(
+                "--progress",
+                `${task.progress}%`
             );
 
+
+            // ---------------------------------------------
+            // SLIDER INPUT
+            // ---------------------------------------------
+
+            slider.addEventListener(
+                "input",
+                () => {
+
+                    const percentage =
+                        Number(
+                            slider.value
+                        );
+
+
+                    // Update progress
+                    task.progress =
+                        percentage;
+
+
+                    // Automatically determine status
+                    if (
+                        percentage ===
+                        0
+                    ) {
+
+                        task.status =
+                            "pending";
+
+                        task.completed =
+                            false;
+
+                    } else if (
+                        percentage >=
+                        100
+                    ) {
+
+                        task.progress =
+                            100;
+
+                        task.status =
+                            "completed";
+
+                        task.completed =
+                            true;
+
+                    } else {
+
+                        task.status =
+                            "in-progress";
+
+                        task.completed =
+                            false;
+
+                    }
+
+
+                    // Update card instantly
+                    progressValue.textContent =
+                        `${task.progress}%`;
+
+
+                    slider.style.setProperty(
+                        "--progress",
+                        `${task.progress}%`
+                    );
+
+
+                    // Update status
+                    updateStatusBadge(
+                        status,
+                        task.status
+                    );
+
+
+                    // Update checkbox
+                    checkbox.checked =
+                        task.status ===
+                        "completed";
+
+
+                    // Update completed styling
+                    if (
+                        task.status ===
+                        "completed"
+                    ) {
+
+                        li.classList.add(
+                            "completed"
+                        );
+
+                    } else {
+
+                        li.classList.remove(
+                            "completed"
+                        );
+
+                    }
+
+
+                    // Save while dragging
+                    saveTasks();
+
+                    updateStats();
+
+                }
+            );
+
+
+            // ---------------------------------------------
+            // PROGRESS CONTAINER
+            // ---------------------------------------------
 
             progressContainer.appendChild(
                 progressInfo
             );
 
+
             progressContainer.appendChild(
-                progressBar
+                slider
             );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // ADD CONTENT
-            // ---------------------------------
+            // ---------------------------------------------
 
-            content.appendChild(title);
+            content.appendChild(
+                title
+            );
 
-            content.appendChild(meta);
+
+            content.appendChild(
+                meta
+            );
+
 
             content.appendChild(
                 progressContainer
             );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // ACTIONS
-            // ---------------------------------
+            // ---------------------------------------------
 
             const actions =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             actions.className =
                 "task-actions";
 
 
-            // EDIT BUTTON
+            // EDIT
             const editButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
+
 
             editButton.className =
                 "edit-btn";
 
+
             editButton.textContent =
                 "✏️";
+
 
             editButton.title =
                 "Edit task";
@@ -849,21 +1101,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 "click",
                 () => {
 
-                    editTask(task);
+                    openEditModal(
+                        task
+                    );
 
                 }
             );
 
 
-            // DELETE BUTTON
+            // DELETE
             const deleteButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
+
 
             deleteButton.className =
                 "delete-btn";
 
+
             deleteButton.textContent =
                 "🗑️";
+
 
             deleteButton.title =
                 "Delete task";
@@ -873,7 +1132,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 "click",
                 () => {
 
-                    deleteTask(task.id);
+                    deleteTask(
+                        task.id
+                    );
 
                 }
             );
@@ -883,22 +1144,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 editButton
             );
 
+
             actions.appendChild(
                 deleteButton
             );
 
 
-            // ---------------------------------
+            // ---------------------------------------------
             // BUILD CARD
-            // ---------------------------------
+            // ---------------------------------------------
 
             main.appendChild(
                 checkbox
             );
 
+
             main.appendChild(
                 content
             );
+
 
             main.appendChild(
                 actions
@@ -917,17 +1181,55 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-        // Save any migrated old tasks
         saveTasks();
 
     }
 
 
-    // =========================================
-    // EDIT TASK
-    // =========================================
+    // =====================================================
+    // STATUS BADGE
+    // =====================================================
 
-    function editTask(task) {
+    function updateStatusBadge(
+        badge,
+        status
+    ) {
+
+        badge.className =
+            `status-badge status-${status}`;
+
+
+        if (
+            status ===
+            "completed"
+        ) {
+
+            badge.textContent =
+                "🟢 Completed";
+
+        } else if (
+            status ===
+            "in-progress"
+        ) {
+
+            badge.textContent =
+                "🟡 In Progress";
+
+        } else {
+
+            badge.textContent =
+                "⚪ Pending";
+
+        }
+
+    }
+
+
+    // =====================================================
+    // EDIT MODAL
+    // =====================================================
+
+    function openEditModal(task) {
 
         taskBeingEdited =
             task;
@@ -938,30 +1240,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         editPriorityInput.value =
-            task.priority || "medium";
-
-
-        editStatusInput.value =
-            task.status ||
-            (
-                task.completed
-                    ? "completed"
-                    : "pending"
-            );
-
-
-        editProgressInput.value =
-            String(
-                typeof task.progress === "number"
-                    ? task.progress
-                    : task.completed
-                        ? 100
-                        : 0
-            );
+            task.priority ||
+            "medium";
 
 
         editDueDateInput.value =
-            task.dueDate || "";
+            task.dueDate ||
+            "";
+
+
+        editProgressInput.value =
+            task.progress || 0;
+
+
+        editProgressValue.textContent =
+            `${task.progress || 0}%`;
+
+
+        updateEditSlider();
 
 
         editModal.classList.add(
@@ -978,24 +1274,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =========================================
+    // =====================================================
+    // EDIT SLIDER
+    // =====================================================
+
+    editProgressInput.addEventListener(
+        "input",
+        () => {
+
+            editProgressValue.textContent =
+                `${editProgressInput.value}%`;
+
+
+            updateEditSlider();
+
+        }
+    );
+
+
+    function updateEditSlider() {
+
+        const value =
+            Number(
+                editProgressInput.value
+            );
+
+
+        const percentage =
+            value;
+
+
+        editProgressInput.style.background =
+            `linear-gradient(
+                to right,
+                var(--emerald) 0%,
+                var(--emerald) ${percentage}%,
+                #e5e7eb ${percentage}%,
+                #e5e7eb 100%
+            )`;
+
+    }
+
+
+    // =====================================================
     // SAVE EDIT
-    // =========================================
+    // =====================================================
 
     saveEditButton.addEventListener(
         "click",
         () => {
 
             if (!taskBeingEdited) {
+
                 return;
+
             }
 
 
-            const newText =
+            const text =
                 editTaskInput.value.trim();
 
 
-            if (newText === "") {
+            if (!text) {
 
                 alert(
                     "Task cannot be empty."
@@ -1004,60 +1344,66 @@ document.addEventListener("DOMContentLoaded", () => {
                 editTaskInput.focus();
 
                 return;
+
             }
 
 
-            let newProgress =
+            let progress =
                 Number(
                     editProgressInput.value
                 );
 
 
-            let newStatus =
-                editStatusInput.value;
-
-
-            // Keep status and progress synchronized
-            if (newProgress >= 100) {
-
-                newProgress = 100;
-
-                newStatus =
-                    "completed";
-
-            } else if (
-                newProgress > 0 &&
-                newStatus === "pending"
-            ) {
-
-                newStatus =
-                    "in-progress";
-
-            }
-
-
+            // Update task
             taskBeingEdited.text =
-                newText;
+                text;
 
 
             taskBeingEdited.priority =
                 editPriorityInput.value;
 
 
-            taskBeingEdited.status =
-                newStatus;
+            taskBeingEdited.dueDate =
+                editDueDateInput.value;
 
 
             taskBeingEdited.progress =
-                newProgress;
+                progress;
 
 
-            taskBeingEdited.completed =
-                newStatus === "completed";
+            // Automatically determine status
+            if (
+                progress === 0
+            ) {
 
+                taskBeingEdited.status =
+                    "pending";
 
-            taskBeingEdited.dueDate =
-                editDueDateInput.value;
+                taskBeingEdited.completed =
+                    false;
+
+            } else if (
+                progress >= 100
+            ) {
+
+                taskBeingEdited.progress =
+                    100;
+
+                taskBeingEdited.status =
+                    "completed";
+
+                taskBeingEdited.completed =
+                    true;
+
+            } else {
+
+                taskBeingEdited.status =
+                    "in-progress";
+
+                taskBeingEdited.completed =
+                    false;
+
+            }
 
 
             saveTasks();
@@ -1072,9 +1418,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =========================================
+    // =====================================================
     // CLOSE MODAL
-    // =========================================
+    // =====================================================
 
     function closeEditModal() {
 
@@ -1082,7 +1428,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "show"
         );
 
-        taskBeingEdited = null;
+
+        taskBeingEdited =
+            null;
 
     }
 
@@ -1099,16 +1447,13 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =========================================
-    // CLICK OUTSIDE MODAL
-    // =========================================
-
     editModal.addEventListener(
         "click",
         event => {
 
             if (
-                event.target === editModal
+                event.target ===
+                editModal
             ) {
 
                 closeEditModal();
@@ -1118,10 +1463,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
-
-    // =========================================
-    // ESCAPE KEY
-    // =========================================
 
     document.addEventListener(
         "keydown",
@@ -1142,9 +1483,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =========================================
-    // DELETE TASK
-    // =========================================
+    // =====================================================
+    // DELETE
+    // =====================================================
 
     function deleteTask(taskId) {
 
@@ -1155,14 +1496,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         if (!confirmed) {
+
             return;
+
         }
 
 
         tasks[currentField] =
             tasks[currentField].filter(
                 task =>
-                    task.id !== taskId
+                    task.id !==
+                    taskId
             );
 
 
@@ -1175,9 +1519,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =========================================
+    // =====================================================
     // SEARCH
-    // =========================================
+    // =====================================================
 
     searchInput.addEventListener(
         "input",
@@ -1192,9 +1536,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =========================================
+    // =====================================================
     // FILTERS
-    // =========================================
+    // =====================================================
 
     filterButtons.forEach(button => {
 
@@ -1206,13 +1550,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     button.dataset.filter;
 
 
-                filterButtons.forEach(btn => {
+                filterButtons.forEach(
+                    btn => {
 
-                    btn.classList.remove(
-                        "active"
-                    );
+                        btn.classList.remove(
+                            "active"
+                        );
 
-                });
+                    }
+                );
 
 
                 button.classList.add(
@@ -1228,9 +1574,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =========================================
+    // =====================================================
     // CLEAR COMPLETED
-    // =========================================
+    // =====================================================
 
     clearCompletedButton.addEventListener(
         "click",
@@ -1243,27 +1589,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 return;
+
             }
 
 
             const categoryTasks =
-                tasks[currentField] || [];
+                tasks[currentField] ||
+                [];
 
 
             const completed =
                 categoryTasks.filter(
                     task =>
-                        task.status === "completed"
+                        task.status ===
+                        "completed"
                 );
 
 
-            if (completed.length === 0) {
+            if (
+                completed.length ===
+                0
+            ) {
 
                 alert(
                     "There are no completed tasks."
                 );
 
                 return;
+
             }
 
 
@@ -1274,14 +1627,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             if (!confirmed) {
+
                 return;
+
             }
 
 
             tasks[currentField] =
                 categoryTasks.filter(
                     task =>
-                        task.status !== "completed"
+                        task.status !==
+                        "completed"
                 );
 
 
@@ -1295,14 +1651,15 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =========================================
+    // =====================================================
     // STATISTICS
-    // =========================================
+    // =====================================================
 
     function updateStats() {
 
         const categoryTasks =
-            tasks[currentField] || [];
+            tasks[currentField] ||
+            [];
 
 
         const total =
@@ -1312,19 +1669,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const completed =
             categoryTasks.filter(
                 task =>
-                    task.status === "completed"
+                    task.status ===
+                    "completed"
             ).length;
 
 
         const pending =
             categoryTasks.filter(
                 task =>
-                    task.status !== "completed"
+                    task.status !==
+                    "completed"
             ).length;
 
 
-        // Calculate average progress
-        let averageProgress = 0;
+        // Average progress
+        let average =
+            0;
 
 
         if (total > 0) {
@@ -1335,7 +1695,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         return sum +
                             Number(
-                                task.progress || 0
+                                task.progress ||
+                                0
                             );
 
                     },
@@ -1343,15 +1704,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-            averageProgress =
+            average =
                 Math.round(
-                    totalProgress / total
+                    totalProgress /
+                    total
                 );
 
         }
 
 
-        // Update cards
         totalTasks.textContent =
             total;
 
@@ -1365,14 +1726,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         progressPercent.textContent =
-            `${averageProgress}%`;
+            `${average}%`;
 
     }
 
 
-    // =========================================
-    // SAVE TASKS
-    // =========================================
+    // =====================================================
+    // SAVE
+    // =====================================================
 
     function saveTasks() {
 
@@ -1380,13 +1741,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             localStorage.setItem(
                 "taskhubTasks",
-                JSON.stringify(tasks)
+                JSON.stringify(
+                    tasks
+                )
             );
 
         } catch (error) {
 
             console.error(
-                "Could not save tasks:",
+                "Could not save tasks.",
                 error
             );
 
@@ -1395,19 +1758,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =========================================
-    // FORMAT CREATED DATE
-    // =========================================
+    // =====================================================
+    // DATE FUNCTIONS
+    // =====================================================
 
-    function formatDate(dateString) {
+    function formatDate(
+        dateString
+    ) {
 
         if (!dateString) {
+
             return "";
+
         }
 
 
         const date =
-            new Date(dateString);
+            new Date(
+                dateString
+            );
 
 
         return date.toLocaleDateString(
@@ -1422,14 +1791,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =========================================
-    // FORMAT DUE DATE
-    // =========================================
-
-    function formatDueDate(dateString) {
+    function formatDueDate(
+        dateString
+    ) {
 
         if (!dateString) {
+
             return "";
+
         }
 
 
@@ -1451,14 +1820,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =========================================
-    // CHECK OVERDUE
-    // =========================================
-
-    function isOverdue(dateString) {
+    function isOverdue(
+        dateString
+    ) {
 
         if (!dateString) {
+
             return false;
+
         }
 
 
